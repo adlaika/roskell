@@ -1,6 +1,11 @@
 module Main where
 
-import Lib
+import Console
+import Types
+import Level
 
-main :: IO ()
-main = undefined
+main = do
+  defaultSettings
+  let world = genesis { _wLevel = level1 }
+  drawWorld world
+  gameLoop world
