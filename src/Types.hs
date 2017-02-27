@@ -13,8 +13,11 @@ module Types
   , emptyLevel
   , genesis
   , tileToChar
+  , (|+|)
+  , dirToCoord
   ) where
 
+import Prelude hiding (Either(..))
 import Data.Map as M
 
 -- IO Types --
@@ -24,6 +27,12 @@ data Input
   | Walk Direction
   | QuitGame
   deriving (Eq)
+
+dirToCoord :: Direction -> Coord
+dirToCoord Up = (0, -1)
+dirToCoord Down = (0, 1)
+dirToCoord Left = (-1, 0)
+dirToCoord Right = (1, 0)
 
 data Direction
   = Up
@@ -40,6 +49,10 @@ data World = World
   }
 
 type Coord = (Int, Int)
+
+-- operator to add 2 coordinates together
+(|+|) :: Coord -> Coord -> Coord
+(|+|) (x1, y1) (x2, y2) = (x1 + x2, y1 + y2)
 
 data Level = Level
   { _lTiles :: M.Map Coord Tile

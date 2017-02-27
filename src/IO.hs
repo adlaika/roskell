@@ -1,4 +1,4 @@
-module Console
+module IO
     ( defaultSettings
     , gameLoop
     , getInput
@@ -18,13 +18,13 @@ import Level
 drawChar :: Char -> IO ()
 drawChar '\n' = putChar '\n'
 drawChar '.' = drawCharBoldForegroundVivid Green '.'
-drawChar '@' = drawCharBoldForegroundVivid Blue '@'
+drawChar '@' = drawCharBoldForegroundVivid Red '@'
 drawChar '#' = drawCharBoldForegroundVivid Black '#'
 drawChar '~' = drawCharBoldForegroundVivid Blue '~'
 drawChar _ = drawCharBoldForegroundVivid Black ' '
 
 drawCharBoldForegroundVivid :: Color -> Char -> IO ()
-drawCharBoldForegroundVivid = drawChar' BoldIntensity Foreground Vivid
+drawCharBoldForegroundVivid = drawChar' NormalIntensity Foreground Vivid
 
 drawChar' :: ConsoleIntensity -> ConsoleLayer -> ColorIntensity -> Color -> Char -> IO ()
 drawChar' consoleIntensity layer colorIntensity color char = do
@@ -77,16 +77,6 @@ getInput = do
     'a' -> return $ Walk Left
     'd' -> return $ Walk Right
     _ -> getInput
-
--- operator to add 2 coordinates together
-(|+|) :: Coord -> Coord -> Coord
-(|+|) (x1, y1) (x2, y2) = (x1 + x2, y1 + y2)
-
-dirToCoord :: Direction -> Coord
-dirToCoord Up = (0, -1)
-dirToCoord Down = (0, 1)
-dirToCoord Left = (-1, 0)
-dirToCoord Right = (1, 0)
 
 -- add the supplied direction to the hero's position, and set that
 -- to be the hero's new position, making sure to limit the hero's

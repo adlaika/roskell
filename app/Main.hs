@@ -1,6 +1,6 @@
 module Main where
 
-import Console
+import IO
 import Types
 import Level
 
