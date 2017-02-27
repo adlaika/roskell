@@ -58,7 +58,7 @@ data Level = Level
   { _lTiles :: M.Map Coord Tile
   , _lItems :: M.Map Coord Item
   , _lMax :: Coord
-  } deriving (Eq)
+  } deriving (Eq, Show)
 
 -- Entity Types --
 
@@ -73,15 +73,15 @@ data Hero = Hero
 data Item
   = ItemArmor Armor
   | ItemWeapon Weapon
-  deriving (Eq)
+  deriving (Eq, Show)
 
 data Armor = Armor
   { _aDefense :: Defense
-  , _aName :: Name } deriving (Eq)
+  , _aName :: Name } deriving (Eq, Show)
 
 data Weapon = Weapon
   { _wAttack :: Attack
-  , _wName :: Name } deriving (Eq)
+  , _wName :: Name } deriving (Eq, Show)
 
 newtype HP = HP Int deriving (Eq, Show)
 newtype Attack = Attack Int deriving (Eq, Show)
@@ -123,7 +123,7 @@ fists :: Weapon
 fists = Weapon (Attack 1) (Name "Fists")
 
 emptyLevel :: Level
-emptyLevel = Level M.empty M.empty (1,1)
+emptyLevel = Level M.empty M.empty (0,0)
 
 genesis :: World
 genesis = World commoner emptyLevel

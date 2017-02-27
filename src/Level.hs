@@ -8,16 +8,24 @@ module Level
     ) where
 
 import qualified Data.Map as M
+import Data.Maybe (fromMaybe)
 
 import Types
+
+safeMax :: Ord a => [a] -> Maybe a
+safeMax [] = Nothing
+safeMax xs = Just $ maximum xs
 
 stringsToLevel :: [String] -> Level
 stringsToLevel str = foldl populate emptyLevel {_lMax=maxXY} asciiMap
   where
     asciiMap = concat $ zipWith zip coords str
     coords = [[(x, y) | x <- [0..]] | y <- [0..]]
-    maxX = maximum . map (fst . fst) $ asciiMap
-    maxY = maximum . map (snd . fst) $ asciiMap
+    xs = map (fst . fst) asciiMap
+    maxFromMaybe l = fromMaybe 0 $ safeMax l
+    maxX = maxFromMaybe xs
+    ys = map (snd . fst) asciiMap
+    maxY = maxFromMaybe ys
     maxXY = (maxX, maxY)
     populate lvl (coord, tile) =
       case tile of
