@@ -17,14 +17,15 @@ import Level
 
 drawChar :: Char -> IO ()
 drawChar '\n' = putChar '\n'
-drawChar '.' = drawCharBoldForegroundVivid Green '.'
-drawChar '@' = drawCharBoldForegroundVivid Red '@'
-drawChar '#' = drawCharBoldForegroundVivid Black '#'
-drawChar '~' = drawCharBoldForegroundVivid Blue '~'
-drawChar _ = drawCharBoldForegroundVivid Black ' '
+drawChar '.' = drawCharNormalForeground Green '.'
+drawChar '@' = drawCharNormalForeground Red '@'
+drawChar '#' = drawCharNormalForeground Black '#'
+drawChar '~' = drawCharNormalForeground Blue '~'
+drawChar _ = drawCharNormalForeground Black ' '
 
-drawCharBoldForegroundVivid :: Color -> Char -> IO ()
-drawCharBoldForegroundVivid = drawChar' NormalIntensity Foreground Vivid
+-- "Vivid" v "Dull" appears to have no effect.
+drawCharNormalForeground :: Color -> Char -> IO ()
+drawCharNormalForeground = drawChar' NormalIntensity Foreground Vivid
 
 drawChar' :: ConsoleIntensity -> ConsoleLayer -> ColorIntensity -> Color -> Char -> IO ()
 drawChar' consoleIntensity layer colorIntensity color char = do
