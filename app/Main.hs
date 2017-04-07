@@ -3,6 +3,8 @@ module Main where
 import Prelude hiding (Either(..))
 import System.Console.ANSI
 import System.IO
+import Control.Monad (guard)
+import Control.Monad.State.Lazy
 
 import Types
 import Level
@@ -10,8 +12,8 @@ import Level
 main = do
   defaultSettings
   let world = genesis { _wLevel = level1 }
-  drawWorld world
-  gameLoop world
+  runStateT drawWorld world
+  runStateT gameLoop world
 
 drawChar :: Char -> IO ()
 drawChar '\n' = putChar '\n'
@@ -32,30 +34,31 @@ drawChar' consoleIntensity layer colorIntensity color char = do
     , SetColor layer colorIntensity color ]
   putChar char
 
-drawCoord :: World -> Coord -> IO ()
-drawCoord world coord = do
-  uncurry (flip setCursorPosition) coord
-  drawChar (coordToChar coord world)
+drawCoord :: Coord -> WorldState IO ()
+drawCoord coord = do
+  liftIO $ uncurry (flip setCursorPosition) coord
+  world <- get
+  liftIO $ drawChar (coordToChar coord world)
 
-drawWorld :: World -> IO ()
-drawWorld world = do
-  setCursorPosition 0 0
-  mapM_ drawChar (unlines chars)
-  where
-    lvl = _wLevel world
-    (x', y') = _lMax lvl
-    chars = [[coordToChar (x,y) world | x <- [0..x']] | y <- [0..y']]
+drawWorld :: WorldState IO ()
+drawWorld = do
+  liftIO $ setCursorPosition 0 0
+  world <- get
+  let lvl = _wLevel
+  let (x', y') = _lMax $ lvl world
+  let chars world = [[coordToChar (x,y) world | x <- [0..x']] | y <- [0..y']]
+  liftIO $ mapM_ drawChar (unlines $ chars world)
 
-drawHero :: World -> IO ()
-drawHero world
-  | newPos == oldPos = return ()
-  | otherwise = do
-    drawCoord world newPos
-    drawCoord world oldPos
-    where
-      hero = _wHero world
-      newPos = _hCurrPos hero
-      oldPos = _hOldPos  hero
+drawHero :: WorldState IO ()
+drawHero = do
+  world <- get
+  let hero = _wHero world
+  let newPos = _hCurrPos hero
+  let oldPos = _hOldPos hero
+  guard $ newPos == oldPos
+  world <- get
+  drawCoord newPos
+  drawCoord oldPos
 
 coordToChar :: Coord -> World -> Char
 coordToChar coord (World hero lvl)
@@ -78,28 +81,40 @@ getInput = do
 -- add the supplied direction to the hero's position, and set that
 -- to be the hero's new position, making sure to limit the hero's
 -- position between 0 and 80 in either direction
-handleWalk :: World -> Direction -> IO ()
-handleWalk world direction
-  | isWall coord lvl = gameLoop world
-      { _wHero = hero { _hOldPos = _hCurrPos hero } }
-  | otherwise = gameLoop world
-      { _wHero = hero { _hOldPos  = _hCurrPos hero, _hCurrPos = coord } }
-  where
-    hero = _wHero world
-    lvl = _wLevel world
-    coord = (newX, newY)
-    newX = inBounds heroX
-    newY = inBounds heroY
-    (heroX, heroY) = _hCurrPos hero |+| dirToCoord direction
-    inBounds i = max 0 (min i 80)
+handleWalk :: Direction -> WorldState IO ()
+handleWalk direction = do
+  world <- get
+  let hero = _wHero world
+  let lvl = _wLevel world
+  let (heroX, heroY) = _hCurrPos hero |+| dirToCoord direction
+  let inBounds i = max 0 (min i 80)
+  let newX = inBounds heroX
+  let newY = inBounds heroY
+  let coord = (newX, newY)
+  if isWall coord lvl
+    then do
+      put World
+        { _wHero = hero { _hOldPos = _hCurrPos hero }
+        , _wLevel = lvl
+        }
+      gameLoop
+    else do
+      put World
+        { _wHero = hero
+          { _hOldPos  = _hCurrPos hero
+          , _hCurrPos = coord }
+        , _wLevel = lvl
+        }
+      gameLoop
 
-gameLoop :: World -> IO ()
-gameLoop world = do
-  drawHero world
-  input <- getInput
+gameLoop :: WorldState IO ()
+gameLoop = do
+  world <- get
+  drawHero
+  input <- liftIO getInput
   case input of
-    QuitGame -> handleQuitGame
-    (Walk dir) -> handleWalk world dir
+    QuitGame -> liftIO handleQuitGame
+    (Walk dir) -> handleWalk dir
 
 handleQuitGame :: IO ()
 handleQuitGame = do

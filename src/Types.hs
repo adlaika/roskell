@@ -1,6 +1,7 @@
 module Types
   ( Input(..)
   , World(..)
+  , WorldState(..)
   , Coord(..)
   , Level(..)
   , Hero(..)
@@ -19,6 +20,7 @@ module Types
 
 import Prelude hiding (Either(..))
 import Data.Map as M
+import Control.Monad.State.Lazy
 
 -- IO Types --
 
@@ -46,7 +48,9 @@ data Direction
 data World = World
   { _wHero :: Hero
   , _wLevel :: Level
-  }
+  } deriving (Eq, Show)
+
+type WorldState = StateT World
 
 type Coord = (Int, Int)
 
@@ -68,7 +72,7 @@ data Hero = Hero
   , _hHP :: HP
   , _hArmor :: Armor
   , _hWeapon :: Weapon
-  } deriving (Eq)
+  } deriving (Eq, Show)
 
 data Item
   = ItemArmor Armor
