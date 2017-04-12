@@ -1,0 +1,37 @@
+name: roskell
+version: 0.0.0
+synopsis: a haskell roguelike
+github: docmoxie/roskell
+
+ghc-options: -Wall
+
+dependencies:
+  - ansi-terminal
+  - base
+  - containers
+  - text
+  - mtl
+
+library:
+  source-dirs: src
+  exposed-modules:
+    - Draw
+    - Game
+    - Level
+    - Types
+
+executable:
+  main: Main.hs
+  source-dirs: app
+  dependencies:
+    - roskell
+
+tests:
+  spec:
+    main: Main.hs
+    source-dirs:
+      - test
+      - src
+    dependencies:
+      - hspec
+    build-tools: hspec-discover

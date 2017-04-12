@@ -5,12 +5,20 @@ module Level
     , isWall
     , isArmor
     , isWeapon
+    , coordToChar
     ) where
 
 import qualified Data.Map as M
 import Data.Maybe (fromMaybe)
 
 import Types
+
+coordToChar :: Coord -> World -> Char
+coordToChar coord (World hero lvl)
+  | _hPos hero == coord = '@'
+  | otherwise = case getTile coord lvl of
+    Just tile -> tileToChar tile
+    Nothing -> error $ "No tile at " ++ show coord ++ "!"
 
 safeMax :: Ord a => [a] -> Maybe a
 safeMax [] = Nothing

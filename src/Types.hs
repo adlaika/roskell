@@ -1,8 +1,8 @@
 module Types
   ( Input(..)
   , World(..)
-  , WorldState(..)
-  , Coord(..)
+  , GameState
+  , Coord
   , Level(..)
   , Hero(..)
   , HP(..)
@@ -11,11 +11,12 @@ module Types
   , Armor(..)
   , Weapon(..)
   , Direction(..)
+  , commoner
+  , dirToCoord
   , emptyLevel
-  , genesis
+  , emptyWorld
   , tileToChar
   , (|+|)
-  , dirToCoord
   ) where
 
 import Prelude hiding (Either(..))
@@ -50,7 +51,7 @@ data World = World
   , _wLevel :: Level
   } deriving (Eq, Show)
 
-type WorldState = StateT World
+type GameState = StateT World
 
 type Coord = (Int, Int)
 
@@ -67,8 +68,7 @@ data Level = Level
 -- Entity Types --
 
 data Hero = Hero
-  { _hCurrPos :: Coord
-  , _hOldPos :: Coord
+  { _hPos :: Coord
   , _hHP :: HP
   , _hArmor :: Armor
   , _hWeapon :: Weapon
@@ -106,15 +106,14 @@ instance Show Tile where
 tileToChar :: Tile -> Char
 tileToChar tile = case show tile of
   [x] -> x
-  x:xs -> error "calling show on a tile produced a string with more than one char."
+  _:_ -> error "calling show on a tile produced a string with more than one char."
   [] -> error "calling show on a tile produced an empty string"
 
 -- Utility functions --
 
 commoner :: Hero
 commoner = Hero
-  { _hCurrPos = (1,1)
-  , _hOldPos = (1,1)
+  { _hPos = (1,1)
   , _hHP = HP 10
   , _hArmor = rags
   , _hWeapon = fists
@@ -129,5 +128,5 @@ fists = Weapon (Attack 1) (Name "Fists")
 emptyLevel :: Level
 emptyLevel = Level M.empty M.empty (0,0)
 
-genesis :: World
-genesis = World commoner emptyLevel
+emptyWorld :: World
+emptyWorld = World commoner emptyLevel
