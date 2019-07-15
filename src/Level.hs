@@ -1,5 +1,6 @@
 module Level
     ( stringsToLevel
+    , levelToStrings
     , level1
     , getTile
     , isWall
@@ -9,6 +10,8 @@ module Level
     ) where
 
 import qualified Data.Map as M
+
+import Data.List.Index (imap)
 import Data.Maybe (fromMaybe)
 
 import Types
@@ -42,6 +45,39 @@ stringsToLevel str = foldl populate emptyLevel {_lMax=maxXY} asciiMap
         '~' -> lvl { _lTiles = M.insert coord Water t }
         _   -> lvl
         where t = _lTiles lvl
+
+levelToStrings :: Level -> [String]
+levelToStrings lvl = ascii
+  where
+    maxX = fst (_lMax lvl)
+    xs = take maxX [0..]
+    maxY = snd (_lMax lvl)
+    ys = take maxY [0..]
+    tiles :: M.Map Coord Tile
+    tiles = _lTiles lvl
+    tileStrings :: M.Map Coord String
+    tileStrings = fmap show tiles
+    ascii :: [String]
+    ascii = M.foldrWithKey tileToAscii (replicate (maxY + 1) "") tileStrings
+    tileToAscii :: Coord -> String -> [String] -> [String]
+    tileToAscii (x,y) tile = imap addTile
+      where
+        addTile yIndex line = if yIndex == y && x <= maxX
+          then tile ++ line
+          else line
+    -- maxXY = (2,2)
+    -- x y tile   ascii
+    -- -------------------------------
+    -- 0 0 "#" -> ["#",   "",    ""]
+    -- 1 0 "." -> ["#.",  "",    ""]
+    -- 2 0 "." -> ["#..", "",    ""]
+    -- 0 1 "." -> ["#..", ".",   ""]
+    -- 1 1 "#" -> ["#..", ".#",  ""]
+    -- 2 1 "~" -> ["#..", ".#~", ""]
+    -- 0 2 "." -> ["#..", ".#~", "."]
+    -- 1 2 "#" -> ["#..", ".#~", ".#"]
+    -- 2 2 "." -> ["#..", ".#~", ".#."]
+
 
 getTile :: Coord -> Level -> Maybe Tile
 getTile coord lvl = M.lookup coord (_lTiles lvl)

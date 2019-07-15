@@ -11,6 +11,7 @@ dependencies:
   - containers
   - text
   - mtl
+  - ilist
 
 library:
   source-dirs: src
