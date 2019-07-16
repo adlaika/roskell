@@ -12,7 +12,7 @@ module Types
   , Weapon(..)
   , Direction(..)
   , commoner
-  , dirToCoord
+  , directionToCoord
   , emptyLevel
   , emptyWorld
   , tileToChar
@@ -31,11 +31,11 @@ data Input
   | QuitGame
   deriving (Eq)
 
-dirToCoord :: Direction -> Coord
-dirToCoord Up = (0, -1)
-dirToCoord Down = (0, 1)
-dirToCoord Left = (-1, 0)
-dirToCoord Right = (1, 0)
+directionToCoord :: Direction -> Coord
+directionToCoord Up = (0, -1)
+directionToCoord Down = (0, 1)
+directionToCoord Left = (-1, 0)
+directionToCoord Right = (1, 0)
 
 data Direction
   = Up

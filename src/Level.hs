@@ -28,19 +28,20 @@ safeMax [] = Nothing
 safeMax xs = Just $ maximum xs
 
 stringsToLevel :: [String] -> Level
-stringsToLevel str = foldl populate emptyLevel {_lMax=maxXY} asciiMap
+stringsToLevel asciiStrings = foldl populate genesis asciiMap
   where
-    asciiMap = concat $ zipWith zip coords str
-    coords = [[(x, y) | x <- [0..]] | y <- [0..]]
-    xs = map (fst . fst) asciiMap
-    maxFromMaybe l = fromMaybe 0 $ safeMax l
-    maxX = maxFromMaybe xs
-    ys = map (snd . fst) asciiMap
-    maxY = maxFromMaybe ys
-    maxXY = (maxX, maxY)
+    genesis = emptyLevel { _lMax=maxXY }
+      where
+        maxXY = (maxFromMaybe xs, maxFromMaybe ys)
+        maxFromMaybe = fromMaybe 0 . safeMax
+        xs = map (fst . fst) asciiMap
+        ys = map (snd . fst) asciiMap
+    asciiMap = concat $ zipWith zip coords asciiStrings
+      where
+        coords = [[(x, y) | x <- [0..]] | y <- [0..]]
     populate lvl (coord, tile) =
       case tile of
-        '#' -> lvl { _lTiles = M.insert coord Wall t }
+        '#' -> lvl { _lTiles = M.insert coord Wall  t }
         '.' -> lvl { _lTiles = M.insert coord Empty t }
         '~' -> lvl { _lTiles = M.insert coord Water t }
         _   -> lvl
@@ -49,22 +50,17 @@ stringsToLevel str = foldl populate emptyLevel {_lMax=maxXY} asciiMap
 levelToStrings :: Level -> [String]
 levelToStrings lvl = ascii
   where
-    maxX = fst (_lMax lvl)
-    xs = take maxX [0..]
-    maxY = snd (_lMax lvl)
-    ys = take maxY [0..]
-    tiles :: M.Map Coord Tile
-    tiles = _lTiles lvl
-    tileStrings :: M.Map Coord String
-    tileStrings = fmap show tiles
-    ascii :: [String]
     ascii = M.foldrWithKey tileToAscii (replicate (maxY + 1) "") tileStrings
-    tileToAscii :: Coord -> String -> [String] -> [String]
+      where
+        maxY = snd (_lMax lvl)
+        tileStrings = fmap show tiles
+        tiles = _lTiles lvl
     tileToAscii (x,y) tile = imap addTile
       where
         addTile yIndex line = if yIndex == y && x <= maxX
           then tile ++ line
           else line
+        maxX = fst (_lMax lvl)
     -- maxXY = (2,2)
     -- x y tile   ascii
     -- -------------------------------

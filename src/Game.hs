@@ -62,7 +62,8 @@ updateWorld (Walk dir) world = handleWalk dir world
 updateWorld _ world = undefined
 
 handleWalk :: Direction -> World -> World
-handleWalk dir world = do
+handleWalk direction world = do
   let hero = _wHero world
-  let (heroX, heroY) = _hPos hero |+| dirToCoord dir
+  let oldPosition = _hPos hero
+  let (heroX, heroY) = oldPosition |+| directionToCoord direction
   world { _wHero = hero { _hPos = (heroX, heroY) } }
