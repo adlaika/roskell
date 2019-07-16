@@ -1,5 +1,6 @@
 module Types
   ( Input(..)
+  , InvalidMove(..)
   , World(..)
   , GameState
   , Coord
@@ -32,17 +33,21 @@ data Input
   deriving (Eq)
 
 directionToCoord :: Direction -> Coord
-directionToCoord Up = (0, -1)
-directionToCoord Down = (0, 1)
-directionToCoord Left = (-1, 0)
-directionToCoord Right = (1, 0)
+directionToCoord DirUp = (0, -1)
+directionToCoord DirDown = (0, 1)
+directionToCoord DirLeft = (-1, 0)
+directionToCoord DirRight = (1, 0)
 
 data Direction
-  = Up
-  | Down
-  | Left
-  | Right
+  = DirUp
+  | DirDown
+  | DirLeft
+  | DirRight
   deriving (Eq)
+
+data InvalidMove
+  = Collision Tile
+  deriving (Eq, Show)
 
 -- World State Types --
 

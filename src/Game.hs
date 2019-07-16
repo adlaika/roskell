@@ -10,8 +10,10 @@ module Game
   , updateWorld
   ) where
 
-import Prelude hiding (Either(..))
+import qualified Data.Map as M
+
 import Control.Monad.State.Lazy
+import Data.Maybe (fromMaybe)
 
 import Types
 
@@ -51,19 +53,29 @@ charToMaybeInput :: Char -> Maybe Input
 charToMaybeInput char =
   case char of
     'q' -> return QuitGame
-    'w' -> return $ Walk Up
-    's' -> return $ Walk Down
-    'a' -> return $ Walk Left
-    'd' -> return $ Walk Right
+    'w' -> return $ Walk DirUp
+    's' -> return $ Walk DirDown
+    'a' -> return $ Walk DirLeft
+    'd' -> return $ Walk DirRight
     _ -> Nothing
 
-updateWorld :: Input -> World -> World
+updateWorld :: Input -> World -> Either InvalidMove World
 updateWorld (Walk dir) world = handleWalk dir world
 updateWorld _ world = undefined
 
-handleWalk :: Direction -> World -> World
+handleWalk :: Direction -> World -> Either InvalidMove World
 handleWalk direction world = do
   let hero = _wHero world
   let oldPosition = _hPos hero
-  let (heroX, heroY) = oldPosition |+| directionToCoord direction
-  world { _wHero = hero { _hPos = (heroX, heroY) } }
+  let newPosition = oldPosition |+| directionToCoord direction
+  if immovableAt newPosition
+    then Left  $ Collision (tileAt newPosition)
+    else Right $ world { _wHero = hero { _hPos = newPosition } }
+    where
+      immovableAt pos = case tileAt pos of
+        Wall -> True
+        _ -> False
+      tileAt pos = fromMaybe
+        Empty
+        (M.lookup pos tiles)
+      tiles = _lTiles $ _wLevel world
