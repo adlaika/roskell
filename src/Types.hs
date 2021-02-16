@@ -2,7 +2,6 @@ module Types
   ( Input(..)
   , InvalidMove(..)
   , World(..)
-  , GameState
   , Coord
   , Level(..)
   , Hero(..)
@@ -22,15 +21,12 @@ module Types
 
 import Prelude hiding (Either(..))
 import Data.Map as M
-import Control.Monad.State.Lazy
 
 -- IO Types --
 
 data Input
-  = Fight Direction
-  | Walk Direction
-  | QuitGame
-  deriving (Eq)
+  = Walk Direction
+  deriving (Eq, Show)
 
 directionToCoord :: Direction -> Coord
 directionToCoord DirUp = (0, -1)
@@ -43,7 +39,7 @@ data Direction
   | DirDown
   | DirLeft
   | DirRight
-  deriving (Eq)
+  deriving (Eq, Show)
 
 data InvalidMove
   = Collision Tile
@@ -54,9 +50,8 @@ data InvalidMove
 data World = World
   { _wHero :: Hero
   , _wLevel :: Level
+  , _wTick :: Int
   } deriving (Eq, Show)
-
-type GameState = StateT World
 
 type Coord = (Int, Int)
 
@@ -134,4 +129,4 @@ emptyLevel :: Level
 emptyLevel = Level M.empty M.empty (0,0)
 
 emptyWorld :: World
-emptyWorld = World commoner emptyLevel
+emptyWorld = World commoner emptyLevel 0

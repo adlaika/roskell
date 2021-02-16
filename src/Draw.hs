@@ -5,6 +5,14 @@ module Draw
   ) where
 
 import System.Console.ANSI
+    ( clearScreen,
+      setCursorPosition,
+      setSGR,
+      Color(Blue, White, Red, Green),
+      ColorIntensity(Vivid),
+      ConsoleIntensity(NormalIntensity),
+      ConsoleLayer(Foreground),
+      SGR(SetColor, SetConsoleIntensity) )
 import Control.Monad.State.Lazy
 
 import Types
@@ -19,7 +27,7 @@ drawWorld world = do
     (x', y') = _lMax lvl
     chars = [[coordToChar (x,y) world | x <- [0..x']] | y <- [0..y']]
 
-getAndDrawWorld :: GameState IO ()
+getAndDrawWorld :: StateT World IO ()
 getAndDrawWorld = do
   world <- get
   liftIO $ drawWorld world
@@ -28,9 +36,9 @@ drawChar :: Char -> IO ()
 drawChar '\n' = putChar '\n'
 drawChar '.' = drawCharNormalForeground Green '.'
 drawChar '@' = drawCharNormalForeground Red '@'
-drawChar '#' = drawCharNormalForeground Black '#'
+drawChar '#' = drawCharNormalForeground White '#'
 drawChar '~' = drawCharNormalForeground Blue '~'
-drawChar _ = drawCharNormalForeground Black ' '
+drawChar _ = drawCharNormalForeground White ' '
 
 -- "Vivid" v "Dull" appears to have no effect.
 drawCharNormalForeground :: Color -> Char -> IO ()

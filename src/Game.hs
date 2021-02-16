@@ -1,11 +1,6 @@
 module Game
   ( GameAction(..)
-  , gameInput
-  , gameLog
-  , gameDraw
-  , gameExit
-  , gameUpdate
-  , pureGameLoop
+  , tick
   , charToMaybeInput
   , updateWorld
   ) where
@@ -24,35 +19,22 @@ data GameAction
   | GameUpdate Input World (World -> GameAction)
   | GameExit
 
-gameInput :: (Input -> GameAction) -> GameAction
-gameInput = GameInput
+-- tickDo :: Monad m => StateT World m GameAction
+-- tickDo = do
+--   oldWorld <- get
+--   undefined 
 
-gameLog :: String -> GameAction -> GameAction
-gameLog = GameLog
-
-gameDraw :: World -> GameAction -> GameAction
-gameDraw = GameDraw
-
-gameExit :: GameAction
-gameExit = GameExit
-
-gameUpdate :: Input -> World -> (World -> GameAction) -> GameAction
-gameUpdate = GameUpdate
-
-pureGameLoop :: Monad m => GameState m GameAction
-pureGameLoop =
+tick :: Monad m => StateT World m GameAction
+tick =
   get >>= \oldWorld ->
-  return $ gameInput $ \input -> -- get/parse player input
-  gameUpdate input oldWorld $ \newWorld -> -- update the world based on above
-  gameDraw newWorld $ -- draw the updated world
-  if input == QuitGame
-    then gameExit
-    else evalState pureGameLoop newWorld
+  pure $ GameInput $ \input -> -- get/parse player input
+  GameUpdate input oldWorld $ \newWorld -> -- update the world based on above
+  GameDraw newWorld $ -- draw the updated world
+  evalState tick newWorld
 
 charToMaybeInput :: Char -> Maybe Input
 charToMaybeInput char =
   case char of
-    'q' -> return QuitGame
     'w' -> return $ Walk DirUp
     's' -> return $ Walk DirDown
     'a' -> return $ Walk DirLeft
@@ -61,7 +43,6 @@ charToMaybeInput char =
 
 updateWorld :: Input -> World -> Either InvalidMove World
 updateWorld (Walk dir) world = handleWalk dir world
-updateWorld _ world = undefined
 
 handleWalk :: Direction -> World -> Either InvalidMove World
 handleWalk direction world = do

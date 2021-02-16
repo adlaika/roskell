@@ -17,7 +17,7 @@ import Data.Maybe (fromMaybe)
 import Types
 
 coordToChar :: Coord -> World -> Char
-coordToChar coord (World hero lvl)
+coordToChar coord (World hero lvl _)
   | _hPos hero == coord = '@'
   | otherwise = case getTile coord lvl of
     Just tile -> tileToChar tile
