@@ -80,9 +80,9 @@ drawChar :: Char -> IO ()
 drawChar '\n' = putChar '\n'
 drawChar '.' = drawCharNormalForeground Green '.'
 drawChar '@' = drawCharNormalForeground Red '@'
-drawChar '#' = drawCharNormalForeground Black '#'
+drawChar '#' = drawCharNormalForeground White '#'
 drawChar '~' = drawCharNormalForeground Blue '~'
-drawChar _ = drawCharNormalForeground Black ' '
+drawChar _ = drawCharNormalForeground White ' '
 
 -- "Vivid" v "Dull" appears to have no effect.
 drawCharNormalForeground :: Color -> Char -> IO ()
