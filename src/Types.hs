@@ -1,7 +1,7 @@
 module Types
   ( Input(..)
   , World(..)
-  , Coord(..)
+  , Coord
   , Level(..)
   , Hero(..)
   , HP(..)
@@ -102,7 +102,7 @@ instance Show Tile where
 tileToChar :: Tile -> Char
 tileToChar tile = case show tile of
   [x] -> x
-  x:xs -> error "calling show on a tile produced a string with more than one char."
+  _:_ -> error "calling show on a tile produced a string with more than one char."
   [] -> error "calling show on a tile produced an empty string"
 
 -- Utility functions --

@@ -17,14 +17,16 @@ safeMax [] = Nothing
 safeMax xs = Just $ maximum xs
 
 stringsToLevel :: [String] -> Level
-stringsToLevel str = foldl populate emptyLevel {_lMax=maxXY} asciiMap
+stringsToLevel strs = foldl populate emptyLevel {_lMax=maxXY} asciiMap
   where
-    asciiMap = concat $ zipWith zip coords str
+    asciiMap = concat $ zipWith zip coords strs
     coords = [[(x, y) | x <- [0..]] | y <- [0..]]
-    xs = map (fst . fst) asciiMap
+    xs = map getX asciiMap
+    getX = fst . fst
     maxFromMaybe l = fromMaybe 0 $ safeMax l
     maxX = maxFromMaybe xs
-    ys = map (snd . fst) asciiMap
+    ys = map getY asciiMap
+    getY = snd . fst
     maxY = maxFromMaybe ys
     maxXY = (maxX, maxY)
     populate lvl (coord, tile) =
