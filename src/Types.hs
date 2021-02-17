@@ -17,7 +17,6 @@ module Types
   , dirToCoord
   ) where
 
-import Prelude hiding (Either(..))
 import Data.Map as M
 
 -- IO Types --
@@ -29,16 +28,16 @@ data Input
   deriving (Eq)
 
 dirToCoord :: Direction -> Coord
-dirToCoord Up = (0, -1)
-dirToCoord Down = (0, 1)
-dirToCoord Left = (-1, 0)
-dirToCoord Right = (1, 0)
+dirToCoord North = (0, -1)
+dirToCoord South = (0, 1)
+dirToCoord East = (-1, 0)
+dirToCoord West = (1, 0)
 
 data Direction
-  = Up
-  | Down
-  | Left
-  | Right
+  = North
+  | South
+  | East
+  | West
   deriving (Eq)
 
 -- World State Types --

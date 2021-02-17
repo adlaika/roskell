@@ -10,19 +10,9 @@ module IO
     , drawWorld
     ) where
 
-import Prelude hiding (Either(..))
 import System.Console.ANSI
 import System.IO
 import Types
-    ( Hero(_hOldPos, _hCurrPos),
-      Level(_lMax),
-      Coord,
-      World(..),
-      Direction(..),
-      Input(Walk, QuitGame),
-      dirToCoord,
-      (|+|),
-      tileToChar )
 import Level
 
 getInput :: IO Input
@@ -30,10 +20,10 @@ getInput = do
   char <- getChar
   case char of
     'q' -> return QuitGame
-    'w' -> return $ Walk Up
-    's' -> return $ Walk Down
-    'a' -> return $ Walk Left
-    'd' -> return $ Walk Right
+    'w' -> return $ Walk North
+    's' -> return $ Walk South
+    'a' -> return $ Walk East
+    'd' -> return $ Walk West
     _ -> getInput
 
 -- add the supplied direction to the hero's position, and set that
